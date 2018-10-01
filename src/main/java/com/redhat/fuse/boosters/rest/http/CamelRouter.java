@@ -6,8 +6,10 @@ import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
- * A simple Camel REST DSL route that implements the greetings service.
+ * A simple Camel REST DSL route that implements the arrivals service.
  * 
  */
 @Component
@@ -20,7 +22,7 @@ public class CamelRouter extends RouteBuilder {
         // @formatter:off
         restConfiguration()
                 .apiContextPath("/api-doc")
-                .apiProperty("api.title", "Greeting REST API")
+                .apiProperty("api.title", "Airport Flights REST API")
                 .apiProperty("api.version", "1.0")
                 .apiProperty("cors", "true")
                 .apiProperty("base.path", "camel/")
@@ -31,36 +33,41 @@ public class CamelRouter extends RouteBuilder {
             .component("servlet")
             .bindingMode(RestBindingMode.json);
         
-        rest("/greetings/").description("Greeting to {name}")
-            .get("/{name}").outType(GreetingsGoodbye.class)
-                .route().routeId("greeting-api")
-            .multicast((AggregationStrategy) (exchange1, exchange2) -> {
-                if (exchange1 == null) {
-                    return exchange2;
-                } else {
-                    Greetings g1 = exchange1.getIn().getBody(Greetings.class);
-                    Goodbye g2 = exchange2.getIn().getBody(Goodbye.class);
-    
-                    exchange1.getIn().setBody(new GreetingsGoodbye(g1, g2));
-                    return exchange1;
-                }
-            })
+        rest("/flights")
+            .description("List all flights (arrivals & departures)")
+            .get()
+            .outType(FlightsList.class)
+            .route().routeId("flights-api")
+            .
+            .multicast(new FlightAggregationStrategy())
             .parallelProcessing()
-            .to("direct:greetingsImplRemote", "direct:goodbyeImpl");
+            // 
+            // NOTE: To switch between local & remote services:
+            //    -  comment out the line that routes to local services
+            //    -  uncomment the line that routes to remote services
+            // 
+            .to("direct:arrivalsImplLocal", "direct:departuresImplLocal");
+            // .to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
     
-        from("direct:greetingsImplRemote").description("Greetings REST service implementation route")
+        from("direct:arrivalsImplRemote").description("Arrivals REST service implementation route")
             .streamCaching()
-            .to("http://www.mocky.io/v2/5bab67cd31000074006542ad?bridgeEndpoint=true&amp;throwExceptionOnFailure=false")
+            .to("http://arrivals-server/arrivals")
             .convertBodyTo(String.class)
-            .unmarshal().json(JsonLibrary.Jackson, Greetings.class);
+            .unmarshal().json(JsonLibrary.Jackson, ArrivalsList.class);
     
-        from("direct:greetingsImplLocal").description("Greetings REST service implementation route")
+        from("direct:departuresImplRemote").description("Departures REST service implementation route")
             .streamCaching()
-            .to("bean:greetingsService?method=getGreetings");
+            .to("http://departures-server/departures")
+            .convertBodyTo(String.class)
+            .unmarshal().json(JsonLibrary.Jackson, DeparturesList.class);
+    
+        from("direct:arrivalsImplLocal").description("Arrivals REST service implementation route")
+            .streamCaching()
+            .to("bean:arrivalsService?method=getArrivals");
         
-        from("direct:goodbyeImpl").description("Goodbye REST service implementation route")
+        from("direct:departuresImplLocal").description("Departures REST service implementation route")
             .streamCaching()
-            .to("bean:goodbyeService?method=getGoodbye");
+            .to("bean:departuresService?method=getDepartures");
         // @formatter:on
     }
 

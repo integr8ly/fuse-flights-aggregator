@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "result": [{
+    "code": "DUB",
+    "time": 1538050030000
+  }, {
+    "code": "JFK",
+    "time": 1538051000000
+  }, {
+    "code": "RDU",
+    "time": 1538052030000
+  }, {
+    "code": "ATL",
+    "time": 1538053030000
+  }]
+}

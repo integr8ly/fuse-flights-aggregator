@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "result": [{
+    "code": "CDG",
+    "time": 1538054430000
+  }, {
+    "code": "JFK",
+    "time": 1538055500000
+  }, {
+    "code": "EWR",
+    "time": 1538056630000
+  }, {
+    "code": "MIA",
+    "time": 1538057730000
+  }]
+}
