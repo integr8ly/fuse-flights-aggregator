@@ -3,7 +3,6 @@ package com.redhat.fuse.boosters.rest.http;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
-import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,7 +37,6 @@ public class CamelRouter extends RouteBuilder {
             .get()
             .outType(FlightsList.class)
             .route().routeId("flights-api")
-            .
             .multicast(new FlightAggregationStrategy())
             .parallelProcessing()
             // 
