@@ -20,6 +20,7 @@ public class CamelRouter extends RouteBuilder {
 
         // @formatter:off
         restConfiguration()
+            .enableCORS(true)
                 .apiContextPath("/api-doc")
                 .apiProperty("api.title", "Airport Flights REST API")
                 .apiProperty("api.version", "1.0")
