@@ -18,6 +18,8 @@ public class CamelRouter extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        String arrivalsHost = System.getenv("ARRIVALS_HOST");
+        String departuresHost = System.getenv("DEPARTURES_HOST");
 
         // @formatter:off
         restConfiguration()
@@ -51,18 +53,18 @@ public class CamelRouter extends RouteBuilder {
             //    -  comment out the line that routes to local services
             //    -  uncomment the line that routes to remote services
             // 
-            .to("direct:arrivalsImplLocal", "direct:departuresImplLocal");
-            // .to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
+//            .to("direct:arrivalsImplLocal", "direct:departuresImplLocal");
+             .to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
     
         from("direct:arrivalsImplRemote").description("Arrivals REST service implementation route")
             .streamCaching()
-            .to("http://arrivals/arrivals")
+            .to(String.format("http://%s/arrivals?bridgeEndpoint=true", arrivalsHost))
             .convertBodyTo(String.class)
             .unmarshal().json(JsonLibrary.Jackson, ArrivalsList.class);
     
         from("direct:departuresImplRemote").description("Departures REST service implementation route")
             .streamCaching()
-            .to("http://departures/departures")
+            .to(String.format("http://%s/departures?bridgeEndpoint=true", departuresHost))
             .convertBodyTo(String.class)
             .unmarshal().json(JsonLibrary.Jackson, DeparturesList.class);
     
