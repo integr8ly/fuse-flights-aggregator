@@ -134,6 +134,40 @@ objects:
       provider: fabric8
       group: com.redhat.fuse.boosters
 - apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+    name: arrivals
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+      service: arrivals
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+    name: departures
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+      service: departures
+- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
@@ -202,6 +236,152 @@ objects:
           kind: ImageStreamTag
           name: fuse-rest-http-booster:latest
       type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+      service: arrivals
+    name: arrivals
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 2
+    selector:
+      app: fuse-rest-http-booster
+      service: arrivals
+      group: com.redhat.fuse.boosters
+    strategy:
+      rollingParams:
+        timeoutSeconds: 3600
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: fuse-rest-http-booster
+          service: arrivals
+          group: com.redhat.fuse.boosters
+      spec:
+        containers:
+        - image: quay.io/dmartin/mockserver:latest
+          imagePullPolicy: IfNotPresent
+          name: arrivals
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          securityContext:
+            privileged: false
+          volumeMounts:
+          - mountPath: /tmp/mocks/arrivals
+            name: arrivals
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: arrivals
+          name: arrivals
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+      service: departures
+    name: departures
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 2
+    selector:
+      app: fuse-rest-http-booster
+      service: departures
+      group: com.redhat.fuse.boosters
+    strategy:
+      rollingParams:
+        timeoutSeconds: 3600
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: fuse-rest-http-booster
+          service: departures
+          group: com.redhat.fuse.boosters
+      spec:
+        containers:
+        - image: quay.io/dmartin/mockserver:latest
+          imagePullPolicy: IfNotPresent
+          name: departures
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          securityContext:
+            privileged: false
+          volumeMounts:
+          - mountPath: /tmp/mocks/departures
+            name: departures
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: departures
+          name: departures
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: ConfigMap
+  data:
+    GET.mock: |-
+      HTTP/1.1 200 OK
+      Content-Type: application/json; charset=utf-8
+
+      {
+        "result": [{
+          "code": "DUB",
+          "time": 1538050030000
+        }, {
+          "code": "JFK",
+          "time": 1538051000000
+        }, {
+          "code": "RDU",
+          "time": 1538052030000
+        }, {
+          "code": "ATL",
+          "time": 1538053030000
+        }]
+      }
+  metadata:
+    labels:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+    name: arrivals
+- apiVersion: v1
+  kind: ConfigMap
+  data:
+    GET.mock: |-
+      HTTP/1.1 200 OK
+      Content-Type: application/json; charset=utf-8
+
+      {
+        "result": [{
+          "code": "CDG",
+          "time": 1538054430000
+        }, {
+          "code": "JFK",
+          "time": 1538055500000
+        }, {
+          "code": "EWR",
+          "time": 1538056630000
+        }, {
+          "code": "MIA",
+          "time": 1538057730000
+        }]
+      }
+  metadata:
+    labels:
+      app: fuse-rest-http-booster
+      group: com.redhat.fuse.boosters
+    name: departures
 - apiVersion: v1
   kind: Route
   metadata:

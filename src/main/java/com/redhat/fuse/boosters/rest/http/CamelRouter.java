@@ -3,6 +3,7 @@ package com.redhat.fuse.boosters.rest.http;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.model.rest.RestParamType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class CamelRouter extends RouteBuilder {
                 .apiProperty("base.path", "camel/")
                 .apiProperty("api.path", "/")
                 .apiProperty("host", "")
-//                .apiProperty("schemes", "")
+                .apiProperty("schemes", "https")
                 .apiContextRouteId("doc-api")
             .component("servlet")
             .bindingMode(RestBindingMode.json);
@@ -36,11 +37,16 @@ public class CamelRouter extends RouteBuilder {
         rest("/flights")
             .description("List all flights (arrivals & departures)")
             .get()
+            .param().name("user_key")
+                .type(RestParamType.query)
+                .required(false)
+                .description("User Key, if calling the API in front of 3Scale.")
+                .endParam()
             .outType(FlightsList.class)
             .route().routeId("flights-api")
             .multicast(new FlightAggregationStrategy())
             .parallelProcessing()
-            // 
+
             // NOTE: To switch between local & remote services:
             //    -  comment out the line that routes to local services
             //    -  uncomment the line that routes to remote services
@@ -50,13 +56,13 @@ public class CamelRouter extends RouteBuilder {
     
         from("direct:arrivalsImplRemote").description("Arrivals REST service implementation route")
             .streamCaching()
-            .to("http://arrivals-server/arrivals")
+            .to("http://arrivals/arrivals")
             .convertBodyTo(String.class)
             .unmarshal().json(JsonLibrary.Jackson, ArrivalsList.class);
     
         from("direct:departuresImplRemote").description("Departures REST service implementation route")
             .streamCaching()
-            .to("http://departures-server/departures")
+            .to("http://departures/departures")
             .convertBodyTo(String.class)
             .unmarshal().json(JsonLibrary.Jackson, DeparturesList.class);
     
