@@ -391,6 +391,9 @@ objects:
       group: com.redhat.fuse.boosters
     name: fuse-flights-aggregator
   spec:
+    tls:
+      insecureEdgeTerminationPolicy: Allow
+      termination: edge
     port:
       targetPort: 8080
     to:
