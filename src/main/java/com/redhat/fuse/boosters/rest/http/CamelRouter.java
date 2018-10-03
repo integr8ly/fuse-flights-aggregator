@@ -20,6 +20,12 @@ public class CamelRouter extends RouteBuilder {
     public void configure() throws Exception {
         String arrivalsHost = System.getenv("ARRIVALS_HOST");
         String departuresHost = System.getenv("DEPARTURES_HOST");
+        
+        if (arrivalsHost == null || arrivalsHost.isEmpty()) {
+            throw new Exception("ARRIVALS_HOST env var not set");
+        } else if(departuresHost == null || departuresHost.isEmpty()) {
+            throw new Exception("DEPARTURES_HOST env var not set");
+        }
 
         // @formatter:off
         restConfiguration()
@@ -53,8 +59,8 @@ public class CamelRouter extends RouteBuilder {
             //    -  comment out the line that routes to local services
             //    -  uncomment the line that routes to remote services
             // 
-//            .to("direct:arrivalsImplLocal", "direct:departuresImplLocal");
-             .to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
+            .to("direct:arrivalsImplLocal", "direct:departuresImplLocal");
+//             .to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
     
         from("direct:arrivalsImplRemote").description("Arrivals REST service implementation route")
             .streamCaching()

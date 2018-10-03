@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: launchpad-builder-fuse-rest-http-booster
+  name: launchpad-builder-fuse-flights-aggregator
   annotations:
     description: This template creates a Build Configuration using an S2I builder.
     tags: instant-app
@@ -59,21 +59,21 @@ objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
-    name: fuse-rest-http-booster
+    name: fuse-flights-aggregator
   spec: {}
 - apiVersion: v1
   kind: BuildConfig
   metadata:
-    name: fuse-rest-http-booster
+    name: fuse-flights-aggregator
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
       provider: fabric8
   spec:
     output:
       to:
         kind: ImageStreamTag
-        name: fuse-rest-http-booster:latest
+        name: fuse-flights-aggregator:latest
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -119,10 +119,10 @@ objects:
       prometheus.io/scrape: "true"
     labels:
       expose: "true"
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       provider: fabric8
       group: com.redhat.fuse.boosters
-    name: fuse-rest-http-booster
+    name: fuse-flights-aggregator
   spec:
     ports:
     - name: http
@@ -130,14 +130,14 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       provider: fabric8
       group: com.redhat.fuse.boosters
 - apiVersion: v1
   kind: Service
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
     name: arrivals
   spec:
@@ -147,14 +147,14 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
       service: arrivals
 - apiVersion: v1
   kind: Service
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
     name: departures
   spec:
@@ -164,22 +164,22 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
       service: departures
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       provider: fabric8
       group: com.redhat.fuse.boosters
-    name: fuse-rest-http-booster
+    name: fuse-flights-aggregator
   spec:
     replicas: 1
     revisionHistoryLimit: 2
     selector:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       provider: fabric8
       group: com.redhat.fuse.boosters
     strategy:
@@ -189,7 +189,7 @@ objects:
     template:
       metadata:
         labels:
-          app: fuse-rest-http-booster
+          app: fuse-flights-aggregator
           provider: fabric8
           group: com.redhat.fuse.boosters
       spec:
@@ -199,7 +199,11 @@ objects:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-          image: fuse-rest-http-booster:latest
+          - name: ARRIVALS_HOST
+            value: arrivals:8080
+          - name: DEPARTURES_HOST
+            value: departures:8080
+          image: fuse-flights-aggregator:latest
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -207,7 +211,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 180
-          name: fuse-rest-http-booster
+          name: fuse-flights-aggregator
           ports:
           - containerPort: 8080
             name: http
@@ -231,16 +235,16 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - fuse-rest-http-booster
+        - fuse-flights-aggregator
         from:
           kind: ImageStreamTag
-          name: fuse-rest-http-booster:latest
+          name: fuse-flights-aggregator:latest
       type: ImageChange
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
       service: arrivals
     name: arrivals
@@ -248,7 +252,7 @@ objects:
     replicas: 1
     revisionHistoryLimit: 2
     selector:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       service: arrivals
       group: com.redhat.fuse.boosters
     strategy:
@@ -258,7 +262,7 @@ objects:
     template:
       metadata:
         labels:
-          app: fuse-rest-http-booster
+          app: fuse-flights-aggregator
           service: arrivals
           group: com.redhat.fuse.boosters
       spec:
@@ -286,7 +290,7 @@ objects:
   kind: DeploymentConfig
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
       service: departures
     name: departures
@@ -294,7 +298,7 @@ objects:
     replicas: 1
     revisionHistoryLimit: 2
     selector:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       service: departures
       group: com.redhat.fuse.boosters
     strategy:
@@ -304,7 +308,7 @@ objects:
     template:
       metadata:
         labels:
-          app: fuse-rest-http-booster
+          app: fuse-flights-aggregator
           service: departures
           group: com.redhat.fuse.boosters
       spec:
@@ -335,24 +339,22 @@ objects:
       HTTP/1.1 200 OK
       Content-Type: application/json; charset=utf-8
 
-      {
-        "result": [{
-          "code": "DUB",
-          "time": 1538050030000
-        }, {
-          "code": "JFK",
-          "time": 1538051000000
-        }, {
-          "code": "RDU",
-          "time": 1538052030000
-        }, {
-          "code": "ATL",
-          "time": 1538053030000
-        }]
-      }
+      [{
+        "code": "DUB",
+        "time": 1538050030000
+      }, {
+        "code": "JFK",
+        "time": 1538051000000
+      }, {
+        "code": "RDU",
+        "time": 1538052030000
+      }, {
+        "code": "ATL",
+        "time": 1538053030000
+      }]
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
     name: arrivals
 - apiVersion: v1
@@ -362,37 +364,35 @@ objects:
       HTTP/1.1 200 OK
       Content-Type: application/json; charset=utf-8
 
-      {
-        "result": [{
-          "code": "CDG",
-          "time": 1538054430000
-        }, {
-          "code": "JFK",
-          "time": 1538055500000
-        }, {
-          "code": "EWR",
-          "time": 1538056630000
-        }, {
-          "code": "MIA",
-          "time": 1538057730000
-        }]
-      }
+      [{
+        "code": "CDG",
+        "time": 1538054430000
+      }, {
+        "code": "JFK",
+        "time": 1538055500000
+      }, {
+        "code": "EWR",
+        "time": 1538056630000
+      }, {
+        "code": "MIA",
+        "time": 1538057730000
+      }]
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       group: com.redhat.fuse.boosters
     name: departures
 - apiVersion: v1
   kind: Route
   metadata:
     labels:
-      app: fuse-rest-http-booster
+      app: fuse-flights-aggregator
       provider: fabric8
       group: com.redhat.fuse.boosters
-    name: fuse-rest-http-booster
+    name: fuse-flights-aggregator
   spec:
     port:
       targetPort: 8080
     to:
       kind: Service
-      name: fuse-rest-http-booster
+      name: fuse-flights-aggregator
