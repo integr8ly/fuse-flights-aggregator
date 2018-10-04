@@ -34,6 +34,7 @@ parameters:
 - name: MAVEN_MIRROR_URL
   description: Maven Nexus Repository to be used during build phase
   displayName:
+  value: 'http://nexus.nexus.svc:8081/nexus/content/groups/public'
   required: false
 - name: BUILDER_IMAGE_NAME
   description: Name of the image to use as a builder image
