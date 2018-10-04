@@ -229,6 +229,13 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
+          resources:
+            limits:
+              cpu: 500m
+              memory: 350Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
           securityContext:
             privileged: false
     triggers:
@@ -275,6 +282,13 @@ objects:
           - containerPort: 8080
             name: http
             protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 30Mi
+            requests:
+              cpu: 100m
+              memory: 15Mi
           securityContext:
             privileged: false
           volumeMounts:
@@ -321,6 +335,13 @@ objects:
           - containerPort: 8080
             name: http
             protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 30Mi
+            requests:
+              cpu: 100m
+              memory: 15Mi
           securityContext:
             privileged: false
           volumeMounts:
