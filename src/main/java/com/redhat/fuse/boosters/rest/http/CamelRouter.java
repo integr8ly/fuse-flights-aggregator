@@ -55,12 +55,13 @@ public class CamelRouter extends RouteBuilder {
             .multicast(new FlightAggregationStrategy())
             .parallelProcessing()
 
-            // NOTE: To switch between local & remote services:
-            //    -  comment out the line that routes to local services
-            //    -  uncomment the line that routes to remote services
-            // 
+            //
+            // COMMENT OUT THIS
             .to("direct:arrivalsImplLocal", "direct:departuresImplLocal");
-//             .to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
+
+            //
+            // UNCOMMENT THIS
+            //.to("direct:arrivalsImplRemote", "direct:departuresImplRemote");
     
         from("direct:arrivalsImplRemote").description("Arrivals REST service implementation route")
             .streamCaching()
