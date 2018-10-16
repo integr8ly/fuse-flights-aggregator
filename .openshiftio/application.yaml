@@ -229,6 +229,13 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
+          resources:
+            limits:
+              cpu: 500m
+              memory: 350Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
           securityContext:
             privileged: false
     triggers:
@@ -275,6 +282,13 @@ objects:
           - containerPort: 8080
             name: http
             protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 30Mi
+            requests:
+              cpu: 100m
+              memory: 15Mi
           securityContext:
             privileged: false
           volumeMounts:
@@ -321,6 +335,13 @@ objects:
           - containerPort: 8080
             name: http
             protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 30Mi
+            requests:
+              cpu: 100m
+              memory: 15Mi
           securityContext:
             privileged: false
           volumeMounts:
@@ -341,6 +362,30 @@ objects:
       Content-Type: application/json; charset=utf-8
 
       [{
+        "code": "LAX",
+        "time": 1538050030000
+      }, {
+        "code": "ORD",
+        "time": 1538051000000
+      }, {
+        "code": "DFW",
+        "time": 1538052030000
+      }, {
+        "code": "DEN",
+        "time": 1538053030000
+      }{
+        "code": "SFO",
+        "time": 1538050030000
+      }, {
+        "code": "LAS",
+        "time": 1538051000000
+      }, {
+        "code": "SEA",
+        "time": 1538052030000
+      }, {
+        "code": "CLT",
+        "time": 1538053030000
+      }{
         "code": "DUB",
         "time": 1538050030000
       }, {
@@ -351,6 +396,12 @@ objects:
         "time": 1538052030000
       }, {
         "code": "ATL",
+        "time": 1538053030000
+      }, {
+        "code": "MCO",
+        "time": 1538052030000
+      }, {
+        "code": "PHX",
         "time": 1538053030000
       }]
   metadata:
@@ -377,6 +428,48 @@ objects:
       }, {
         "code": "MIA",
         "time": 1538057730000
+      }, {
+        "code": "LAX",
+        "time": 1538060030000
+      }, {
+        "code": "ORD",
+        "time": 1538052000000
+      }, {
+        "code": "DFW",
+        "time": 1538051030000
+      }, {
+        "code": "DEN",
+        "time": 1538053230000
+      }{
+        "code": "SFO",
+        "time": 1538060030000
+      }, {
+        "code": "LAS",
+        "time": 1538052000000
+      }, {
+        "code": "SEA",
+        "time": 1538051030000
+      }, {
+        "code": "CLT",
+        "time": 1538053230000
+      }{
+        "code": "DUB",
+        "time": 1538060030000
+      }, {
+        "code": "JFK",
+        "time": 1538052000000
+      }, {
+        "code": "RDU",
+        "time": 1538051030000
+      }, {
+        "code": "ATL",
+        "time": 1538053230000
+      }, {
+        "code": "MCO",
+        "time": 1538051030000
+      }, {
+        "code": "PHX",
+        "time": 1538053230000
       }]
   metadata:
     labels:
