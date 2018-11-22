@@ -1,5 +1,5 @@
 ## Motivation
-<!-- Add references to relevant tickets or a short description of what motivated you to do it. (E.g Trello Card AND/OR ISSUE: https://github.com/integr8ly/tutorial-web-app/issues) -->
+<!-- Add references to relevant tickets or a short description of what motivated you to do it. (E.g https://github.com/integr8ly/fuse-flights-aggregator/issues) -->
 
 ## What
 <!-- Add a short answer for: What was done in this PR? (E.g Don't allow users has access to the feature X.) -->
