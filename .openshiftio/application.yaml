@@ -282,13 +282,7 @@ objects:
           - containerPort: 8080
             name: http
             protocol: TCP
-          resources:
-            limits:
-              cpu: 100m
-              memory: 30Mi
-            requests:
-              cpu: 100m
-              memory: 15Mi
+          resources: {}
           securityContext:
             privileged: false
           volumeMounts:
@@ -335,13 +329,7 @@ objects:
           - containerPort: 8080
             name: http
             protocol: TCP
-          resources:
-            limits:
-              cpu: 100m
-              memory: 30Mi
-            requests:
-              cpu: 100m
-              memory: 15Mi
+          resources: {}
           securityContext:
             privileged: false
           volumeMounts:
